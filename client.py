@@ -15,11 +15,8 @@ def on_closing():
 		root.destroy()
 		launched = False
 
-def doNothing():
-    pass
-
 def stopRound():
-    global active_round
+    global active_round, panstwo_entry_r1
     if active_round==1:
         panstwo_entry_r1.config(state=tk.DISABLED)
         miasto_entry_r1.config(state=tk.DISABLED)
@@ -30,6 +27,18 @@ def stopRound():
         active_round=2
         round_label.config(text=f"Round - {active_round}")
         count()
+        sendMessager1 = {
+            "round": str(active_round-1),
+            "panstwo" : panstwo_entry_r1.get(),
+            "miasto" : miasto_entry_r1.get(),
+            "zwierze" : zwierze_entry_r1.get(),
+            "roslina" : roslina_entry_r1.get(),
+            "imie" : imie_entry_r1.get()
+        }
+        sendmessageBr1 = pickle.dumps(sendMessager1)
+        sock.send(sendmessageBr1)
+        print(f"Sent data: {sendMessager1}")
+        point_r1_label.config(text=str(int(panstwo_point_r1_label.cget("text"))+int(miasto_point_r1_label.cget("text"))+int(zwierze_point_r1_label.cget("text"))+int(roslina_point_r1_label.cget("text"))+int(imie_point_r1_label.cget("text"))))
     elif active_round==2:
         panstwo_entry_r2.config(state=tk.DISABLED)
         miasto_entry_r2.config(state=tk.DISABLED)
@@ -40,6 +49,19 @@ def stopRound():
         active_round=3
         round_label.config(text=f"Round - {active_round}")
         count()
+
+        sendMessager2 = {
+            "round": str(active_round-1),
+            "panstwo" : panstwo_entry_r2.get(),
+            "miasto" : miasto_entry_r2.get(),
+            "zwierze" : zwierze_entry_r2.get(),
+            "roslina" : roslina_entry_r2.get(),
+            "imie" : imie_entry_r2.get()
+        }
+        sendmessageBr2 = pickle.dumps(sendMessager2)
+        sock.send(sendmessageBr2)
+        print(f"Sent data: {sendMessager2}")
+        point_r2_label.config(text=str(int(panstwo_point_r2_label.cget("text")) + int(miasto_point_r2_label.cget("text")) + int(zwierze_point_r2_label.cget("text")) + int(roslina_point_r2_label.cget("text")) + int(imie_point_r2_label.cget("text"))))
     elif active_round==3:
         panstwo_entry_r3.config(state=tk.DISABLED)
         miasto_entry_r3.config(state=tk.DISABLED)
@@ -50,7 +72,20 @@ def stopRound():
         active_round=1
         round_label.config(text=f"Round - {active_round}")
         count()
-        
+        sendMessager3 = {
+            "round": str(active_round-1),
+            "panstwo" : panstwo_entry_r3.get(),
+            "miasto" : miasto_entry_r3.get(),
+            "zwierze" : zwierze_entry_r3.get(),
+            "roslina" : roslina_entry_r3.get(),
+            "imie" : imie_entry_r3.get()
+        }
+        sendmessageBr3 = pickle.dumps(sendMessager3)
+        sock.send(sendmessageBr3)
+        print(f"Sent data: {sendMessager3}")
+        point_r3_label.config(text=str(int(panstwo_point_r3_label.cget("text")) + int(miasto_point_r3_label.cget("text")) + int(zwierze_point_r3_label.cget("text")) + int(roslina_point_r3_label.cget("text")) + int(imie_point_r3_label.cget("text"))))
+        points_summary_label.config(text="Summary: "+str(int(point_r1_label.cget("text")) + int(point_r2_label.cget("text")) + int(point_r3_label.cget("text"))))
+
 def count():
     global counter, letters_r1_label, letters_r2_label, letters_r3_label, switch, active_round
     if active_round == 1:
@@ -92,7 +127,7 @@ def stopletter():
         zwierze_entry_r1.config(state=tk.NORMAL)
         roslina_entry_r1.config(state=tk.NORMAL)
         imie_entry_r1.config(state=tk.NORMAL)
-        sw1=False   
+        sw1=False
         messagebox.showinfo("Active letter", f"Active letter is: {active_r1_letter}")
     elif active_round==2:
         active_r2_letter=letters_r2_label.cget("text")
@@ -117,7 +152,8 @@ def stopletter():
         roslina_entry_r3.config(state=tk.NORMAL)
         imie_entry_r3.config(state=tk.NORMAL)
         sw3=False
-        messagebox.showinfo("Active letter", f"Active letter is: {active_r3_letter}") 
+        messagebox.showinfo("Active letter", f"Active letter is: {active_r3_letter}")
+
 
 #other
 alphabet=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
@@ -147,23 +183,23 @@ point_r2_label = tk.Label(text="0")
 point_r3_label = tk.Label(text="0")
 points_summary_label = tk.Label(text="Summary: 0")
 #label (points of topic, round-1)
-panstwo_point_r1_label = tk.Label(text="0")
-miasto_point_r1_label = tk.Label(text="0")
-zwierze_point_r1_label = tk.Label(text="0")
-roslina_point_r1_label = tk.Label(text="0")
-imie_point_r1_label = tk.Label(text="0")
+panstwo_point_r1_label = tk.Label(text="1")
+miasto_point_r1_label = tk.Label(text="1")
+zwierze_point_r1_label = tk.Label(text="1")
+roslina_point_r1_label = tk.Label(text="1")
+imie_point_r1_label = tk.Label(text="1")
 #label (points of topic, round-2)
-panstwo_point_r2_label = tk.Label(text="0")
-miasto_point_r2_label = tk.Label(text="0")
-zwierze_point_r2_label = tk.Label(text="0")
-roslina_point_r2_label = tk.Label(text="0")
-imie_point_r2_label = tk.Label(text="0")
+panstwo_point_r2_label = tk.Label(text="2")
+miasto_point_r2_label = tk.Label(text="2")
+zwierze_point_r2_label = tk.Label(text="2")
+roslina_point_r2_label = tk.Label(text="2")
+imie_point_r2_label = tk.Label(text="2")
 #label (points of topic, round-3)
-panstwo_point_r3_label = tk.Label(text="0")
-miasto_point_r3_label = tk.Label(text="0")
-zwierze_point_r3_label = tk.Label(text="0")
-roslina_point_r3_label = tk.Label(text="0")
-imie_point_r3_label = tk.Label(text="0")
+panstwo_point_r3_label = tk.Label(text="3")
+miasto_point_r3_label = tk.Label(text="3")
+zwierze_point_r3_label = tk.Label(text="3")
+roslina_point_r3_label = tk.Label(text="3")
+imie_point_r3_label = tk.Label(text="3")
 #entry (round-1)
 panstwo_entry_r1 = tk.Entry(state=tk.DISABLED)
 miasto_entry_r1 = tk.Entry(state=tk.DISABLED)
@@ -192,8 +228,8 @@ gotownosc_r1_button = tk.Button(text="Gotowy", state=tk.DISABLED, command=stopRo
 gotownosc_r2_button = tk.Button(text="Gotowy", state=tk.DISABLED, command=stopRound)
 gotownosc_r3_button = tk.Button(text="Gotowy", state=tk.DISABLED, command=stopRound)
 #other
-myNumber_label=tk.Label(root, text="Your number is: "+str(number))
-stopsPlayer_label=tk.Label(root, text="Stops player is: "+str(stopsPlayer))
+# myNumber_label=tk.Label(root, text="Your number is: "+str(number))
+# stopsPlayer_label=tk.Label(root, text="Stops player is: "+str(stopsPlayer))
 
 """config"""
 #entry (round-1)
@@ -311,6 +347,14 @@ sw=True
 root.title("Państwa Miasta")
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
+def dataToJoin():
+    sub = tk.Toplevel(root)
+    sub.title("Connecting to the server")
+    sub.geometry("300x300+125+125")
+
+    sub.mainloop()
+dataToJoin()
+
 while True:
     if launched:
         root.update_idletasks()
@@ -323,17 +367,14 @@ while True:
         if sw==True:
             number=sock.recv(2048)
             number=pickle.loads(number)
-            print("Your nuber is: ",number)
+            print("Your number is: ",number)
             sw=False
         try:
             data=sock.recv(2048)
             data=pickle.loads(data)
             # print(data)
             stopsPlayer=data["stopPlayer"]
-            print(stopsPlayer, type(stopsPlayer))
         except:pass
-        print("Your number is: ",number, type(number))
-
         if int(number)==int(stopsPlayer):
             iAmStopsPlayer=True
         else:

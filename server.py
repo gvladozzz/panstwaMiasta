@@ -2,7 +2,7 @@ import socket
 import time
 # import random
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, Text
 import pickle
 
 class Player():
@@ -13,9 +13,10 @@ class Player():
         # self.round2=round2
         # self.round3=round3
         # self.summaryPoints=summaryPoints
-        self.errors=0
-        self.stop_letter=False
+        # self.errors=0
+        # self.stop_letter=False
 
+"""functions"""
 def identify_stops_player():
     global stops_player
     stops_player = int(stops_player_label.cget("text"))-1
@@ -24,28 +25,30 @@ def identify_stops_player():
     log.config(state=tk.NORMAL)
     log.insert("1.0", f"Stops player changed to {str(stops_player)};\n")
     log.config(state=tk.DISABLED)
+
 def identify_stops_player2():
     global stops_player
     stops_player = int(stops_player_label.cget("text"))+1
-    if stops_player>len(players):stops_player=0#random.randint(0, len(players))
+    if stops_player>len(players):stops_player=0
     stops_player_label.config(text=str(stops_player))
     log.config(state=tk.NORMAL)
     log.insert("1.0", f"Stops player changed to {str(stops_player)};\n")
     log.config(state=tk.DISABLED)
-    
-root = tk.Tk()
-launched = True
 
-"""functions"""
 def on_closing():
     global launched, root
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
         launched = False
 
+def procRecData(data):
+    print(data)
+
 """variables"""
+root = tk.Tk()
+launched = True
 #other
-alphabet=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+# alphabet=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 active_round=1
 switch=True
 switch2=True
@@ -57,8 +60,8 @@ identify_stops_player_button2 = tk.Button(root, text="--->", command=identify_st
 stops_player_label=tk.Label(root, text="0")
 stops_player_label2=tk.Label(root, text="Stops player is")
 
-connection_list=tk.Text(root, state=tk.DISABLED, width=45, height=20)
-log=tk.Text(root, state=tk.DISABLED, width=45, height=20)
+connection_list=tk.Text(root, state=tk.DISABLED, width=60, height=20)
+log=tk.Text(root, state=tk.DISABLED, width=60, height=20)
 
 connection_list.grid(column=0, rowspan=50)
 log.grid(column=0, rowspan=50)
@@ -77,9 +80,9 @@ server.bind(("localhost", 10000))
 server.setblocking(False)
 server.listen(5)
 players=[]
-print("Socket created;")
+print("Server has stared.")
 
-root.attributes('-zoomed', True)
+root.state('zoomed') # Linux: root.attributes('-zoomed', True)
 root.title("Państwa Miasta (server)")
 root.protocol("WM_DELETE_WINDOW", on_closing)
 # root.mainloop()
@@ -98,28 +101,38 @@ while True:
             new_player=Player(new_socket, address)
             players.append(new_player)
             new_socket.send(pickle.dumps(str(players.index(new_player))))
+            log.config(state=tk.NORMAL)
+            log.insert("1.0", f"Given number: '{(str(players.index(new_player)))}' for the player : {str(address)};\n")
+            log.config(state=tk.DISABLED)
             
         except:pass
+
+        for player in players:
+            try:
+                data = player.connection.recv(1024)
+                data = pickle.loads(data)
+                log.config(state=tk.NORMAL)
+                log.insert("1.0",f"Received data: {data};\n")
+                log.config(state=tk.DISABLED)
+                procRecData(data)
+
+            except: pass
             # print("No one wants to join the game")           
         for player in players:
             try:
                 sendmessage = {
                     "stopPlayer": stops_player_label.cget("text")
                 }
-                print(sendmessage)
                 sendmessageB = pickle.dumps(sendmessage)
-                print(sendmessageB)
                 player.connection.send(sendmessageB)
-                player.errors=0
             except:
-                player.errors+=1
-                if player.errors<=100:
-                    players.remove(player)
-                    player.connection.close()
-                    print(f"Player {address} disconnected;\n")
-                    connection_list.config(state=tk.NORMAL)
-                    connection_list.insert("1.0", f"Player {address} disconnected;\n")
-                    connection_list.config(state=tk.DISABLED)
+                players.remove(player)
+                player.connection.close()
+                print(f"Player {address} disconnected;\n")
+                connection_list.config(state=tk.NORMAL)
+                connection_list.insert("1.0", f"Player {address} disconnected;\n")
+                connection_list.config(state=tk.DISABLED)
         time.sleep(0.1)
     else: break
+print("Server has stopped.")
 server.close()
