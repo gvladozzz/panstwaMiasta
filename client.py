@@ -118,6 +118,16 @@ sw3=True
 def stopletter():
     global switch, switch2, switch3, sw1, sw2, sw3
     if active_round==1:
+        if iAmStopsPlayer:
+            data = {"type" : "stopsPlayer",
+                    "round" : active_round,
+                    "ready" : True,
+                    "number" : number,
+                    "letter" : letters_r1_label.cget("text")
+                    }
+            dataB = pickle.dumps(data)
+            print(data, "\n", dataB, "\n")
+            sock.send(dataB)
         active_r1_letter=letters_r1_label.cget("text")
         switch=False
         r1_stop_button.config(state=tk.DISABLED)
@@ -153,7 +163,6 @@ def stopletter():
         imie_entry_r3.config(state=tk.NORMAL)
         sw3=False
         messagebox.showinfo("Active letter", f"Active letter is: {active_r3_letter}")
-
 
 #other
 alphabet=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
@@ -347,14 +356,6 @@ sw=True
 root.title("Państwa Miasta")
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-def dataToJoin():
-    sub = tk.Toplevel(root)
-    sub.title("Connecting to the server")
-    sub.geometry("300x300+125+125")
-
-    sub.mainloop()
-dataToJoin()
-
 while True:
     if launched:
         root.update_idletasks()
@@ -368,6 +369,7 @@ while True:
             number=sock.recv(2048)
             number=pickle.loads(number)
             print("Your number is: ",number)
+            tk.Label(text="Your number is: "+str(number)).grid(column=0, row=4)
             sw=False
         try:
             data=sock.recv(2048)
@@ -377,6 +379,7 @@ while True:
         except:pass
         if int(number)==int(stopsPlayer):
             iAmStopsPlayer=True
+            # print(stopsPlayer, number)
         else:
             iAmStopsPlayer=False
         if active_round == 1:

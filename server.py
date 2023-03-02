@@ -17,6 +17,10 @@ class Player():
         # self.stop_letter=False
 
 """functions"""
+
+def syncData(data):
+    letterB = data['letter']
+    print(letterB)
 def identify_stops_player():
     global stops_player
     stops_player = int(stops_player_label.cget("text"))-1
@@ -114,7 +118,10 @@ while True:
                 log.config(state=tk.NORMAL)
                 log.insert("1.0",f"Received data: {data};\n")
                 log.config(state=tk.DISABLED)
-                procRecData(data)
+                if data["type"] == "stopsPlayer":
+                    syncData(data)
+
+                # procRecData(data)
 
             except: pass
             # print("No one wants to join the game")           
